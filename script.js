@@ -17,34 +17,39 @@ const initialValues = {
 let formValues = { ...initialValues };
 let formErrors = {};
 
+function syncFormValuesFromForm() {
+  const form = document.getElementById('inviteForm');
+  if (!form) return;
+
+  const formData = new FormData(form);
+  formValues = {
+    full_name: (formData.get('full_name') || '').toString().trim(),
+    email: (formData.get('email') || '').toString().trim(),
+    whatsapp_number: (formData.get('whatsapp_number') || '').toString().trim(),
+    attendance: (formData.get('attendance') || 'attending').toString(),
+    payment_made: (formData.get('payment_made') || '').toString()
+  };
+
+  const paymentSection = document.getElementById('paymentSection');
+  if (paymentSection) {
+    paymentSection.style.display = formValues.attendance === 'attending' ? 'block' : 'none';
+  }
+
+  if (formValues.attendance !== 'attending') {
+    formValues.payment_made = '';
+    const paymentField = document.getElementById('payment_made');
+    if (paymentField) paymentField.value = '';
+  }
+}
+
 // Auto-update form state when inputs change
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('inviteForm');
   if (form) {
-    form.addEventListener('change', (e) => {
-      const { name, value } = e.target;
-      formValues[name] = value;
-      
-      // Clear error for this field
-      if (formErrors[name]) {
-        delete formErrors[name];
-        document.getElementById(`error-${name}`).textContent = '';
-      }
-      
-      // Show/hide payment section based on attendance
-      if (name === 'attendance') {
-        const paymentSection = document.getElementById('paymentSection');
-        if (value === 'attending') {
-          paymentSection.style.display = 'block';
-          formValues.payment_made = '';
-          document.getElementById('payment_made').value = '';
-        } else {
-          paymentSection.style.display = 'none';
-          formValues.payment_made = '';
-          document.getElementById('payment_made').value = '';
-        }
-      }
-    });
+    form.addEventListener('input', syncFormValuesFromForm);
+    form.addEventListener('change', syncFormValuesFromForm);
+    form.addEventListener('submit', handleSubmit);
+    syncFormValuesFromForm();
   }
 });
 
@@ -148,7 +153,11 @@ async function saveRegistration() {
 }
 
 async function handleSubmit(e) {
-  e.preventDefault();
+  if (e && typeof e.preventDefault === 'function') {
+    e.preventDefault();
+  }
+
+  syncFormValuesFromForm();
   
   // Validate form
   if (!validateForm()) {
