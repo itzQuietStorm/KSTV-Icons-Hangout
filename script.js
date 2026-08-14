@@ -27,8 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // Show/hide payment section based on attendance
       if (name === 'attendance') {
         const paymentSection = document.getElementById('paymentSection');
-        if (value === 'attending' || value === 'maybe') {
-          paymentSection.style.display = 'grid';
+        if (value === 'attending') {
+          paymentSection.style.display = 'block';
+          formValues.payment_made = '';
+          document.getElementById('payment_made').value = '';
         } else {
           paymentSection.style.display = 'none';
           formValues.payment_made = '';
@@ -100,12 +102,13 @@ function validateForm() {
     showError('Please select your attendance status.', 'attendance');
   }
   
-  // Validate payment if attending or maybe
-  if (formValues.attendance === 'attending' || formValues.attendance === 'maybe') {
+  // If attending, validate payment is confirmed
+  if (formValues.attendance === 'attending') {
     if (!formValues.payment_made) {
       showError('Please confirm your payment status.', 'payment_made');
+      return false;
     } else if (formValues.payment_made === 'no') {
-      showError('Try again after you have made payment', 'payment_made');
+      showError('Try again after making payment', 'payment_made');
       return false;
     }
   }
@@ -121,7 +124,7 @@ function handleSubmit(e) {
     return;
   }
   
-  // Check if attending
+  // Check if not attending
   if (formValues.attendance === 'not_attending') {
     showError('Sorry we will not have you around 😔');
     setTimeout(() => {
@@ -130,9 +133,9 @@ function handleSubmit(e) {
     return;
   }
   
-  // Check payment
-  if (formValues.payment_made === 'no') {
-    showError('Try again after you have made payment');
+  // If attending, payment must be confirmed as 'yes'
+  if (formValues.attendance === 'attending' && formValues.payment_made !== 'yes') {
+    showError('Try again after making payment');
     return;
   }
   
