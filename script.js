@@ -1,20 +1,51 @@
+function scrollToForm() {
+  const form = document.getElementById("inviteForm");
+  if (form) {
+    form.scrollIntoView({ behavior: "smooth" });
+    form.querySelector("input").focus();
+  }
+}
+
+function clearMessages() {
+  const errorEl = document.getElementById("formError");
+  const successEl = document.getElementById("formSuccess");
+  errorEl.textContent = "";
+  errorEl.classList.remove("show");
+  successEl.textContent = "";
+  successEl.classList.remove("show");
+}
+
+function showError(message) {
+  clearMessages();
+  const errorEl = document.getElementById("formError");
+  errorEl.textContent = message;
+  errorEl.classList.add("show");
+}
+
+function showSuccess(message) {
+  clearMessages();
+  const successEl = document.getElementById("formSuccess");
+  successEl.textContent = message;
+  successEl.classList.add("show");
+}
+
 function validateInputs(requirePhone = false) {
   const name = document.getElementById("fullName").value.trim();
   const email = document.getElementById("email").value.trim();
   const phone = document.getElementById("phone").value.trim();
 
   if (!name) {
-    alert("Please enter the guest's full name.");
+    showError("Please enter your full name.");
     return false;
   }
 
   if (!email || !email.includes("@")) {
-    alert("Please enter a valid email address.");
+    showError("Please enter a valid email address.");
     return false;
   }
 
   if (requirePhone && (!phone || phone.length < 7)) {
-    alert("Please enter a valid phone number including country code (numbers only).");
+    showError("Please enter a valid phone number including country code.");
     return false;
   }
 
@@ -34,6 +65,7 @@ function sendWhatsApp() {
   const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
 
   window.open(whatsappUrl, "_blank");
+  showSuccess("Opening WhatsApp... Your invitation link is ready!");
 }
 
 function sendEmail() {
@@ -46,4 +78,5 @@ function sendEmail() {
   const mailtoUrl = `mailto:${encodeURIComponent(data.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
   window.location.href = mailtoUrl;
+  showSuccess("Opening email client... Your invitation is ready!");
 }
