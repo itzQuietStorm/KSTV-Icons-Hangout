@@ -778,6 +778,17 @@ body {
   justify-content: center;
 }
 
+.qr-link {
+  display: inline-block;
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: 0.75rem;
+  color: #67e8f9;
+  text-align: center;
+  text-decoration: underline;
+}
+
 .qr-code-box canvas {
   width: 250px;
   height: 250px;

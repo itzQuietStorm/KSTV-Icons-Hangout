@@ -3,7 +3,7 @@ const SUPABASE_URL = 'https://jmpdquhvvfzcmeimyywi.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptcGRxdWh2dmZ6Y21laW15eXdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1Mzk3NjgsImV4cCI6MjEwMjExNTc2OH0.oQ9MJZQZiVvwuqAlzuCo_gknyKUcXtaGeLp6Bq-5Wyw';
 
 // Initialize Supabase client
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 // Form state management
 const initialValues = {
@@ -123,7 +123,31 @@ function validateForm() {
   return Object.keys(formErrors).length === 0;
 }
 
-function handleSubmit(e) {
+async function saveRegistration() {
+  if (!supabase) {
+    console.error('Supabase client is not available.');
+    return false;
+  }
+
+  const registrationData = {
+    full_name: formValues.full_name.trim(),
+    email: formValues.email.trim(),
+    whatsapp_number: formValues.whatsapp_number.trim(),
+    attendance: formValues.attendance,
+    payment_made: formValues.payment_made || 'not_required'
+  };
+
+  const { error } = await supabase.from('registrations').insert([registrationData]);
+
+  if (error) {
+    console.error('Supabase insert error:', error);
+    return false;
+  }
+
+  return true;
+}
+
+async function handleSubmit(e) {
   e.preventDefault();
   
   // Validate form
@@ -145,13 +169,19 @@ function handleSubmit(e) {
     showError('Try again after making payment');
     return;
   }
+
+  const saved = await saveRegistration();
+  if (!saved) {
+    showError('Registration could not be saved. Please check Supabase and try again.');
+    return;
+  }
   
   // Show submit confirmation
   showSuccess('Registration confirmed! Your invitation is ready.');
   
   // Generate QR code after a brief delay
   setTimeout(() => {
-    generateQRCode(formValues.full_name);
+    generateQRCode(formValues.full_name.trim());
   }, 500);
 }
 
@@ -203,27 +233,31 @@ function scrollToForm() {
 let currentQRCode = null;
 
 function generateQRCode(participantName) {
-  // Clear previous QR code
   const qrContainer = document.getElementById('qrCode');
+  const qrLink = document.getElementById('qrLink');
+  const safeName = participantName.trim();
+
   qrContainer.innerHTML = '';
-  
-  // Generate confirmation URL
-  const confirmationURL = window.location.origin + window.location.pathname.replace('index.html', '') + 'confirmation.html?name=' + encodeURIComponent(participantName);
-  
-  // Create QR code
+
+  const confirmationURL = new URL('confirmation.html', window.location.href);
+  confirmationURL.searchParams.set('name', safeName);
+
+  if (qrLink) {
+    qrLink.href = confirmationURL.toString();
+    qrLink.textContent = confirmationURL.toString();
+    qrLink.style.display = 'inline-block';
+  }
+
   currentQRCode = new QRCode(qrContainer, {
-    text: confirmationURL,
+    text: confirmationURL.toString(),
     width: 250,
     height: 250,
     colorDark: '#000000',
     colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.H
   });
-  
-  // Display participant name
-  document.getElementById('participantName').textContent = participantName;
-  
-  // Show confirmation modal
+
+  document.getElementById('participantName').textContent = safeName;
   document.getElementById('confirmationModal').style.display = 'flex';
 }
 
@@ -249,6 +283,12 @@ function downloadQRCode() {
 
 function closeConfirmation() {
   document.getElementById('confirmationModal').style.display = 'none';
+  const qrLink = document.getElementById('qrLink');
+  if (qrLink) {
+    qrLink.textContent = 'Generating link...';
+    qrLink.href = '#';
+    qrLink.style.display = 'none';
+  }
   resetForm();
   scrollToForm();
 }
