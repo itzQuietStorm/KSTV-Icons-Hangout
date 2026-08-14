@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KSTV Icons - Invitation Portal</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
   <main class="main-container">
@@ -192,6 +193,39 @@
           <button type="submit" class="btn-submit">Confirm registration</button>
         </form>
       </section>
+
+      <!-- Confirmation Modal -->
+      <div id="confirmationModal" class="confirmation-modal" style="display: none;">
+        <div class="confirmation-content">
+          <div class="confirmation-header">
+            <h2 class="confirmation-title">Registration Confirmed! 🎉</h2>
+            <p class="confirmation-subtitle">Your KSTV Icons event pass is ready</p>
+          </div>
+
+          <div class="confirmation-body">
+            <div class="participant-info">
+              <p class="info-label">Registered Name:</p>
+              <p class="info-value" id="participantName"></p>
+            </div>
+
+            <div class="qr-container">
+              <p class="qr-label">Your Event Pass (Scan at Entry)</p>
+              <div id="qrCode" class="qr-code-box"></div>
+              <p class="qr-instruction">Scan this QR code at the event entrance for quick check-in</p>
+            </div>
+
+            <div class="confirmation-actions">
+              <button type="button" class="btn-download" onclick="downloadQRCode()">
+                <svg viewBox="0 0 24 24" class="download-icon"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                Download QR Code
+              </button>
+              <button type="button" class="btn-close" onclick="closeConfirmation()">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 

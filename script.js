@@ -141,6 +141,11 @@ function handleSubmit(e) {
   
   // Show submit confirmation
   showSuccess('Registration confirmed! Your invitation is ready.');
+  
+  // Generate QR code after a brief delay
+  setTimeout(() => {
+    generateQRCode(formValues.full_name);
+  }, 500);
 }
 
 function resetForm() {
@@ -186,4 +191,57 @@ function scrollToForm() {
   if (form) {
     form.scrollIntoView({ behavior: 'smooth' });
   }
+}
+// QR Code functions
+let currentQRCode = null;
+
+function generateQRCode(participantName) {
+  // Clear previous QR code
+  const qrContainer = document.getElementById('qrCode');
+  qrContainer.innerHTML = '';
+  
+  // Generate confirmation URL
+  const confirmationURL = window.location.origin + window.location.pathname.replace('index.html', '') + 'confirmation.html?name=' + encodeURIComponent(participantName);
+  
+  // Create QR code
+  currentQRCode = new QRCode(qrContainer, {
+    text: confirmationURL,
+    width: 250,
+    height: 250,
+    colorDark: '#000000',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+  
+  // Display participant name
+  document.getElementById('participantName').textContent = participantName;
+  
+  // Show confirmation modal
+  document.getElementById('confirmationModal').style.display = 'flex';
+}
+
+function downloadQRCode() {
+  // Get the canvas element from QR code
+  const canvas = document.querySelector('#qrCode canvas');
+  
+  if (!canvas) {
+    alert('QR Code not found. Please try again.');
+    return;
+  }
+  
+  // Create a download link
+  const link = document.createElement('a');
+  link.href = canvas.toDataURL('image/png');
+  link.download = `KSTV-Icons-${formValues.full_name.replace(/\s+/g, '-')}-QR.png`;
+  
+  // Trigger download
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function closeConfirmation() {
+  document.getElementById('confirmationModal').style.display = 'none';
+  resetForm();
+  scrollToForm();
 }
