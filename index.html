@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KSTV Icons - Invitation Portal</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h2>KSTV Icons Portal</h2>
+      <p>Send instant invitations via WhatsApp or Email</p>
+    </div>
+
+    <form id="inviteForm">
+      <div class="form-group">
+        <label for="fullName">Guest Full Name</label>
+        <input type="text" id="fullName" placeholder="e.g. Jane Doe" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="jane@example.com" required />
+      </div>
+
+      <div class="form-group">
+        <label for="phone">WhatsApp Phone Number (with Country Code)</label>
+        <input type="tel" id="phone" placeholder="e.g. 15551234567" required />
+      </div>
+
+      <div class="button-group">
+        <button type="button" class="btn btn-whatsapp" onclick="sendWhatsApp()">
+          <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.84 9.84 0 0 0 12.04 2m.01 1.67c4.55 0 8.24 3.69 8.24 8.24 0 2.2-.86 4.27-2.42 5.82a8.18 8.18 0 0 1-5.82 2.42c-1.42 0-2.82-.37-4.04-1.08l-.29-.17-3.11.82.83-3.03-.19-.3A8.19 8.19 0 0 1 3.8 11.9c0-4.55 3.69-8.23 8.25-8.23z"/></svg>
+          Send WhatsApp
+        </button>
+
+        <button type="button" class="btn btn-email" onclick="sendEmail()">
+          <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          Send Email
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
