@@ -546,6 +546,91 @@ body {
   height: 20px;
 }
 
+/* Button Options */
+.button-options {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.option-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid rgba(251, 191, 36, 0.3);
+  background: transparent;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fbbf24;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.option-btn:hover {
+  border-color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.option-btn.active {
+  background: #fbbf24;
+  color: #0f172a;
+  border-color: #fbbf24;
+}
+
+/* Section Groups */
+.section-group {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Form Message */
+.form-message {
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  display: none;
+}
+
+.form-message.show {
+  display: block;
+}
+
+.form-message.info {
+  background: rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  color: #06b6d4;
+}
+
+.form-message.warning {
+  background: rgba(251, 146, 60, 0.1);
+  border: 1px solid rgba(251, 146, 60, 0.3);
+  color: #fb923c;
+}
+
+.form-message.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.form-message.success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #6ee7b7;
+}
+
 .icon {
   width: 18px;
   height: 18px;

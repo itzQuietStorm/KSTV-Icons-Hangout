@@ -123,23 +123,48 @@
 
           <div id="formError" class="form-error"></div>
           <div id="formSuccess" class="form-success"></div>
+          <div id="formMessage" class="form-message"></div>
 
+          <!-- Step 1: Attendance Question -->
           <div class="form-group">
-            <label for="fullName">Full Name</label>
-            <input type="text" id="fullName" placeholder="Your full name" required />
+            <label>Will you be attending the hangout?</label>
+            <div class="button-options">
+              <button type="button" class="option-btn" data-value="yes" onclick="handleAttendance('yes')">Yes</button>
+              <button type="button" class="option-btn" data-value="no" onclick="handleAttendance('no')">No</button>
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" placeholder="your@email.com" required />
+          <!-- Step 2: Contact Details (shown if attending) -->
+          <div id="contactDetailsSection" class="section-group" style="display: none;">
+            <div class="form-group">
+              <label for="fullName">Full Name</label>
+              <input type="text" id="fullName" placeholder="Your full name" />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" placeholder="your@email.com" />
+            </div>
+
+            <div class="form-group">
+              <label for="phone">WhatsApp Number</label>
+              <input type="tel" id="phone" placeholder="+1 555 1234567" />
+            </div>
           </div>
 
-          <div class="form-group">
-            <label for="phone">WhatsApp Number</label>
-            <input type="tel" id="phone" placeholder="+1 555 1234567" required />
+          <!-- Step 3: Payment Question (shown if attending) -->
+          <div id="paymentSection" class="section-group" style="display: none;">
+            <div class="form-group">
+              <label>Have you made payment?</label>
+              <div class="button-options">
+                <button type="button" class="option-btn" data-value="yes" onclick="handlePayment('yes')">Yes</button>
+                <button type="button" class="option-btn" data-value="no" onclick="handlePayment('no')">No</button>
+              </div>
+            </div>
           </div>
 
-          <div class="button-group">
+          <!-- Submit Buttons -->
+          <div id="submitButtonsSection" class="button-group" style="display: none;">
             <button type="button" class="btn btn-whatsapp" onclick="sendWhatsApp()">
               <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.84 9.84 0 0 0 12.04 2m.01 1.67c4.55 0 8.24 3.69 8.24 8.24 0 2.2-.86 4.27-2.42 5.82a8.18 8.18 0 0 1-5.82 2.42c-1.42 0-2.82-.37-4.04-1.08l-.29-.17-3.11.82.83-3.03-.19-.3A8.19 8.19 0 0 1 3.8 11.9c0-4.55 3.69-8.23 8.25-8.23z"/></svg>
               Send WhatsApp
