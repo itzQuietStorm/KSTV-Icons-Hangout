@@ -1,171 +1,164 @@
 // Form state management
-const formState = {
-  attending: null,
-  paymentMade: null,
+const initialValues = {
+  full_name: '',
+  email: '',
+  whatsapp_number: '',
+  attendance: 'attending',
+  payment_made: '',
 };
 
+let formValues = { ...initialValues };
+let formErrors = {};
+
+// Auto-update form state when inputs change
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('inviteForm');
+  if (form) {
+    form.addEventListener('change', (e) => {
+      const { name, value } = e.target;
+      formValues[name] = value;
+      
+      // Clear error for this field
+      if (formErrors[name]) {
+        delete formErrors[name];
+        document.getElementById(`error-${name}`).textContent = '';
+      }
+      
+      // Show/hide payment section based on attendance
+      if (name === 'attendance') {
+        const paymentSection = document.getElementById('paymentSection');
+        if (value === 'attending' || value === 'maybe') {
+          paymentSection.style.display = 'grid';
+        } else {
+          paymentSection.style.display = 'none';
+          formValues.payment_made = '';
+          document.getElementById('payment_made').value = '';
+        }
+      }
+    });
+  }
+});
+
 function clearMessages() {
-  const errorEl = document.getElementById("formError");
-  const successEl = document.getElementById("formSuccess");
-  const messageEl = document.getElementById("formMessage");
-  errorEl.textContent = "";
-  errorEl.classList.remove("show");
-  successEl.textContent = "";
-  successEl.classList.remove("show");
-  messageEl.textContent = "";
-  messageEl.classList.remove("show", "info", "warning", "error", "success");
+  document.getElementById('formError').textContent = '';
+  document.getElementById('formError').classList.remove('show');
+  document.getElementById('formSuccess').textContent = '';
+  document.getElementById('formSuccess').classList.remove('show');
+  
+  // Clear all field errors
+  Object.keys(initialValues).forEach((field) => {
+    const errorEl = document.getElementById(`error-${field}`);
+    if (errorEl) errorEl.textContent = '';
+  });
 }
 
-function showError(message) {
+function showError(message, field = null) {
   clearMessages();
-  const errorEl = document.getElementById("formError");
-  errorEl.textContent = message;
-  errorEl.classList.add("show");
+  if (field) {
+    const errorEl = document.getElementById(`error-${field}`);
+    if (errorEl) errorEl.textContent = message;
+    formErrors[field] = message;
+  } else {
+    const errorEl = document.getElementById('formError');
+    errorEl.textContent = message;
+    errorEl.classList.add('show');
+  }
 }
 
 function showSuccess(message) {
   clearMessages();
-  const successEl = document.getElementById("formSuccess");
+  const successEl = document.getElementById('formSuccess');
   successEl.textContent = message;
-  successEl.classList.add("show");
+  successEl.classList.add('show');
 }
 
-function showMessage(message, type = "info") {
+function validateForm() {
+  formErrors = {};
   clearMessages();
-  const messageEl = document.getElementById("formMessage");
-  messageEl.textContent = message;
-  messageEl.classList.add("show", type);
+  
+  // Validate full name
+  if (!formValues.full_name.trim()) {
+    showError('Please enter your full name.', 'full_name');
+  }
+  
+  // Validate email
+  if (!formValues.email.trim()) {
+    showError('Please enter your email address.', 'email');
+  } else if (!formValues.email.includes('@')) {
+    showError('Please enter a valid email address.', 'email');
+  }
+  
+  // Validate WhatsApp number
+  if (!formValues.whatsapp_number.trim()) {
+    showError('Please enter your WhatsApp number.', 'whatsapp_number');
+  } else if (formValues.whatsapp_number.replace(/\D/g, '').length < 7) {
+    showError('Please enter a valid phone number.', 'whatsapp_number');
+  }
+  
+  // Validate attendance
+  if (!formValues.attendance) {
+    showError('Please select your attendance status.', 'attendance');
+  }
+  
+  // Validate payment if attending or maybe
+  if (formValues.attendance === 'attending' || formValues.attendance === 'maybe') {
+    if (!formValues.payment_made) {
+      showError('Please confirm your payment status.', 'payment_made');
+    } else if (formValues.payment_made === 'no') {
+      showError('Try again after you have made payment', 'payment_made');
+      return false;
+    }
+  }
+  
+  return Object.keys(formErrors).length === 0;
+}
+
+function handleSubmit(e) {
+  e.preventDefault();
+  
+  // Validate form
+  if (!validateForm()) {
+    return;
+  }
+  
+  // Check if attending
+  if (formValues.attendance === 'not_attending') {
+    showError('Sorry we will not have you around 😔');
+    setTimeout(() => {
+      resetForm();
+    }, 2000);
+    return;
+  }
+  
+  // Check payment
+  if (formValues.payment_made === 'no') {
+    showError('Try again after you have made payment');
+    return;
+  }
+  
+  // Show submit confirmation
+  showSuccess('Registration confirmed! Your invitation is ready.');
 }
 
 function resetForm() {
-  formState.attending = null;
-  formState.paymentMade = null;
+  formValues = { ...initialValues };
+  formErrors = {};
   
-  // Reset all buttons
-  document.querySelectorAll(".option-btn").forEach((btn) => {
-    btn.classList.remove("active");
-  });
+  const form = document.getElementById('inviteForm');
+  if (form) form.reset();
   
-  // Hide sections
-  document.getElementById("contactDetailsSection").style.display = "none";
-  document.getElementById("paymentSection").style.display = "none";
-  document.getElementById("submitButtonsSection").style.display = "none";
-  
-  // Clear input fields
-  document.getElementById("fullName").value = "";
-  document.getElementById("email").value = "";
-  document.getElementById("phone").value = "";
-  
+  document.getElementById('paymentSection').style.display = 'none';
   clearMessages();
-}
-
-function handleAttendance(response) {
-  formState.attending = response === "yes";
-  formState.paymentMade = null;
-  
-  // Update button states
-  document.querySelectorAll(".option-btn[data-value]").forEach((btn) => {
-    if (btn.parentElement.querySelector("label").textContent.includes("Will you be attending")) {
-      btn.classList.toggle("active", btn.dataset.value === response);
-    }
-  });
-  
-  clearMessages();
-  
-  if (formState.attending) {
-    // Show contact details and payment sections
-    document.getElementById("contactDetailsSection").style.display = "block";
-    document.getElementById("paymentSection").style.display = "block";
-    
-    // Reset payment button
-    document.querySelectorAll(".option-btn[data-value]").forEach((btn) => {
-      if (btn.parentElement.querySelector("label").textContent.includes("Have you made payment")) {
-        btn.classList.remove("active");
-      }
-    });
-    
-    showMessage("Great! Please provide your details and confirm payment status.", "info");
-  } else {
-    // Not attending
-    document.getElementById("contactDetailsSection").style.display = "none";
-    document.getElementById("paymentSection").style.display = "none";
-    document.getElementById("submitButtonsSection").style.display = "none";
-    
-    showMessage("Sorry we will not have you around 😞", "warning");
-    
-    // Clear form after showing message
-    setTimeout(() => {
-      resetForm();
-    }, 3000);
-  }
-}
-
-function handlePayment(response) {
-  formState.paymentMade = response === "yes";
-  
-  // Update button states
-  document.querySelectorAll(".option-btn[data-value]").forEach((btn) => {
-    if (btn.parentElement.querySelector("label").textContent.includes("Have you made payment")) {
-      btn.classList.toggle("active", btn.dataset.value === response);
-    }
-  });
-  
-  clearMessages();
-  
-  if (formState.paymentMade) {
-    // Show submit buttons
-    document.getElementById("submitButtonsSection").style.display = "flex";
-    showMessage("Payment confirmed! Please send your invitation via WhatsApp or Email.", "success");
-  } else {
-    // Hide submit buttons
-    document.getElementById("submitButtonsSection").style.display = "none";
-    showMessage("Try again after you have made payment", "error");
-  }
-}
-
-function validateInputs(requirePhone = false) {
-  const name = document.getElementById("fullName").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-
-  if (!name) {
-    showError("Please enter your full name.");
-    return false;
-  }
-
-  if (!email || !email.includes("@")) {
-    showError("Please enter a valid email address.");
-    return false;
-  }
-
-  if (requirePhone && (!phone || phone.length < 7)) {
-    showError("Please enter a valid phone number including country code.");
-    return false;
-  }
-
-  return { name, email, phone };
 }
 
 function sendWhatsApp() {
-  const data = validateInputs(true);
-  if (!data) return;
-
-  // Check attendance and payment status
-  if (!formState.attending || !formState.paymentMade) {
-    showError("Please complete all steps before sending.");
-    return;
-  }
-
-  // Format phone number by removing non-numeric characters
-  const cleanPhone = data.phone.replace(/\D/g, "");
-
-  const message = `Hello ${data.name},\n\nYou are cordially invited to the upcoming KSTV Icons event! We look forward to having you join us.\n\nBest regards,\nKSTV Icons Team`;
-
+  const cleanPhone = formValues.whatsapp_number.replace(/\D/g, '');
+  const message = `Hello ${formValues.full_name},\n\nYou are cordially invited to the upcoming KSTV Icons event! We look forward to having you join us.\n\nBest regards,\nKSTV Icons Team`;
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
-
-  window.open(whatsappUrl, "_blank");
-  showSuccess("Opening WhatsApp... Your invitation link is ready!");
+  
+  window.open(whatsappUrl, '_blank');
+  showSuccess('Opening WhatsApp... Your invitation link is ready!');
   
   setTimeout(() => {
     resetForm();
@@ -173,24 +166,21 @@ function sendWhatsApp() {
 }
 
 function sendEmail() {
-  const data = validateInputs(false);
-  if (!data) return;
-
-  // Check attendance and payment status
-  if (!formState.attending || !formState.paymentMade) {
-    showError("Please complete all steps before sending.");
-    return;
-  }
-
-  const subject = "Official Invitation - KSTV Icons Event";
-  const body = `Hello ${data.name},\n\nYou are cordially invited to the upcoming KSTV Icons event! We look forward to having you join us.\n\nBest regards,\nKSTV Icons Team`;
-
-  const mailtoUrl = `mailto:${encodeURIComponent(data.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
+  const subject = 'Official Invitation - KSTV Icons Event';
+  const body = `Hello ${formValues.full_name},\n\nYou are cordially invited to the upcoming KSTV Icons event! We look forward to having you join us.\n\nBest regards,\nKSTV Icons Team`;
+  const mailtoUrl = `mailto:${encodeURIComponent(formValues.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  
   window.location.href = mailtoUrl;
-  showSuccess("Opening email client... Your invitation is ready!");
+  showSuccess('Opening email client... Your invitation is ready!');
   
   setTimeout(() => {
     resetForm();
   }, 2000);
+}
+
+function scrollToForm() {
+  const form = document.getElementById('inviteForm');
+  if (form) {
+    form.scrollIntoView({ behavior: 'smooth' });
+  }
 }
