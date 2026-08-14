@@ -2,8 +2,10 @@
 const SUPABASE_URL = 'https://jmpdquhvvfzcmeimyywi.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptcGRxdWh2dmZ6Y21laW15eXdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1Mzk3NjgsImV4cCI6MjEwMjExNTc2OH0.oQ9MJZQZiVvwuqAlzuCo_gknyKUcXtaGeLp6Bq-5Wyw';
 
-// Initialize Supabase client
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+// Initialize Supabase client without clashing with the global `supabase` object.
+const supabaseClient = window.supabase && typeof window.supabase.createClient === 'function'
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
 
 // Form state management
 const initialValues = {
@@ -130,7 +132,7 @@ function validateForm() {
 }
 
 async function saveRegistration() {
-  if (!supabase) {
+  if (!supabaseClient) {
     console.error('Supabase client is not available.');
     return false;
   }
@@ -143,7 +145,7 @@ async function saveRegistration() {
     payment_made: formValues.payment_made || 'not_required'
   };
 
-  const { error } = await supabase.from('registrations').insert([registrationData]);
+  const { error } = await supabaseClient.from('registrations').insert([registrationData]);
 
   if (error) {
     console.error('Supabase insert error:', error);
@@ -185,11 +187,16 @@ async function handleSubmit(e) {
     showError('Registration could not be saved. Please check Supabase and try again.');
     return;
   }
-  
-  // Show submit confirmation and keep the filled form data intact until dismissal
+
+  // Send a personalized invitation to the registered email address.
+  setTimeout(() => {
+    sendInvitationEmail();
+  }, 250);
+
+  // Show submit confirmation and keep the filled form data intact until dismissal.
   showSuccess('Registration confirmed! Your invitation is ready.');
-  
-  // Generate QR code after a brief delay
+
+  // Generate QR code after a brief delay.
   setTimeout(() => {
     generateQRCode(formValues.full_name.trim());
   }, 500);
@@ -220,17 +227,28 @@ function sendWhatsApp() {
   }, 2000);
 }
 
-function sendEmail() {
+function sendInvitationEmail() {
+  const recipient = (formValues.email || '').trim();
+  if (!recipient) {
+    console.warn('No email address available for invitation mail.');
+    return;
+  }
+
   const subject = 'Official Invitation - KSTV Icons Event';
-  const body = `Hello ${formValues.full_name},\n\nYou are cordially invited to the upcoming KSTV Icons event! We look forward to having you join us.\n\nBest regards,\nKSTV Icons Team`;
-  const mailtoUrl = `mailto:${encodeURIComponent(formValues.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  
-  window.location.href = mailtoUrl;
+  const body = `Hello ${formValues.full_name || 'Guest'},\n\nYou are cordially invited to the upcoming KSTV Icons event! We look forward to having you join us.\n\nEvent details:\n- Date: 30th August, 2026\n- Location: Kano\n- Status: Confirmed attendance\n\nBest regards,\nKSTV Icons Team`;
+
+  const mailtoUrl = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const mailLink = document.createElement('a');
+  mailLink.href = mailtoUrl;
+  mailLink.style.display = 'none';
+  document.body.appendChild(mailLink);
+  mailLink.click();
+  document.body.removeChild(mailLink);
+}
+
+function sendEmail() {
+  sendInvitationEmail();
   showSuccess('Opening email client... Your invitation is ready!');
-  
-  setTimeout(() => {
-    resetForm();
-  }, 2000);
 }
 
 function scrollToForm() {
@@ -245,8 +263,16 @@ let currentQRCode = null;
 function generateQRCode(participantName) {
   const qrContainer = document.getElementById('qrCode');
   const qrLink = document.getElementById('qrLink');
-  const safeName = participantName.trim();
+  const participantElement = document.getElementById('participantName');
+  const confirmationModal = document.getElementById('confirmationModal');
 
+  if (!qrContainer || !participantElement || !confirmationModal || !window.QRCode) {
+    console.error('QR code library or required elements are unavailable.');
+    showError('Unable to generate the QR code right now. Please refresh the page and try again.');
+    return;
+  }
+
+  const safeName = (participantName || '').trim();
   qrContainer.innerHTML = '';
 
   const confirmationURL = new URL('confirmation.html', window.location.href);
@@ -258,17 +284,17 @@ function generateQRCode(participantName) {
     qrLink.style.display = 'inline-block';
   }
 
-  currentQRCode = new QRCode(qrContainer, {
+  currentQRCode = new window.QRCode(qrContainer, {
     text: confirmationURL.toString(),
     width: 250,
     height: 250,
     colorDark: '#000000',
     colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.H
+    correctLevel: window.QRCode.CorrectLevel.H
   });
 
-  document.getElementById('participantName').textContent = safeName;
-  document.getElementById('confirmationModal').style.display = 'flex';
+  participantElement.textContent = safeName;
+  confirmationModal.style.display = 'flex';
 }
 
 function downloadQRCode() {
