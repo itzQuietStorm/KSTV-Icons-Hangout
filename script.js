@@ -30,12 +30,13 @@ function syncFormValuesFromForm() {
     payment_made: (formData.get('payment_made') || '').toString()
   };
 
+  const paymentRequiredForAttendance = ['attending', 'maybe'];
   const paymentSection = document.getElementById('paymentSection');
   if (paymentSection) {
-    paymentSection.style.display = formValues.attendance === 'attending' ? 'block' : 'none';
+    paymentSection.style.display = paymentRequiredForAttendance.includes(formValues.attendance) ? 'block' : 'none';
   }
 
-  if (formValues.attendance !== 'attending') {
+  if (!paymentRequiredForAttendance.includes(formValues.attendance)) {
     formValues.payment_made = '';
     const paymentField = document.getElementById('payment_made');
     if (paymentField) paymentField.value = '';
@@ -114,8 +115,8 @@ function validateForm() {
     showError('Please select your attendance status.', 'attendance');
   }
   
-  // If attending, validate payment is confirmed
-  if (formValues.attendance === 'attending') {
+  // If attending or maybe, validate payment status is confirmed
+  if (['attending', 'maybe'].includes(formValues.attendance)) {
     if (!formValues.payment_made) {
       showError('Please confirm your payment status.', 'payment_made');
       return false;
@@ -173,8 +174,8 @@ async function handleSubmit(e) {
     return;
   }
   
-  // If attending, payment must be confirmed as 'yes'
-  if (formValues.attendance === 'attending' && formValues.payment_made !== 'yes') {
+  // If attending or maybe, payment must be confirmed as 'yes'
+  if (['attending', 'maybe'].includes(formValues.attendance) && formValues.payment_made !== 'yes') {
     showError('Try again after making payment');
     return;
   }
@@ -185,7 +186,7 @@ async function handleSubmit(e) {
     return;
   }
   
-  // Show submit confirmation
+  // Show submit confirmation and keep the filled form data intact until dismissal
   showSuccess('Registration confirmed! Your invitation is ready.');
   
   // Generate QR code after a brief delay
