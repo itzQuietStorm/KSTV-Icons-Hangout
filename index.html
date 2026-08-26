@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KSTV Icons - Invitation Portal</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <main class="main-container">
+    <div class="max-width-container">
+      <!-- Header -->
+      <header class="header-bar">
+        <div class="header-left">
+          <div class="header-logo">
+            K
+          </div>
+          <div class="header-text">
+            <p class="header-brand">KSTV Icons</p>
+            <p class="header-subtitle">Hangout Event</p>
+          </div>
+        </div>
+        <button type="button" class="header-btn" onclick="scrollToForm()">
+          RSVP now
+        </button>
+        <a class="header-admin-link" href="admin.html">Admin</a>
+      </header>
+
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="hero-content">
+          <div class="hero-badge">
+            Event registration is ready
+          </div>
+          <h1 class="hero-title">The iconic night for culture, music, and connection.</h1>
+          <p class="hero-description">
+            Join KSTV Icons for a memorable evening of performances, community, and premium experiences designed to bring people together.
+          </p>
+          <div class="hero-meta">
+            <span class="meta-tag">30th August, 2026</span>
+          </div>
+          <div class="hero-buttons">
+            <button type="button" class="btn-primary" onclick="scrollToForm()">
+              Reserve a spot
+            </button>
+          </div>
+        </div>
+
+        <!-- Featured Card -->
+        <div class="featured-card">
+          <div class="featured-header">
+            <span class="featured-label">Featured</span>
+            <span class="featured-status">Open</span>
+          </div>
+          <div class="featured-content">
+            <p class="featured-subtitle">Event access</p>
+            <h2 class="featured-title">VIP + Standard</h2>
+            <p class="featured-description">Premium seats, curated networking, and a memorable night built for the culture scene.</p>
+            <div class="featured-highlights">
+              <div class="highlight-item">
+                <span class="highlight-label">Guests</span>
+                <span class="highlight-value">40+</span>
+              </div>
+              <div class="highlight-item">
+                <span class="highlight-label">Experience</span>
+                <span class="highlight-value">Music, Fun, Network</span>
+              </div>
+              <div class="highlight-item">
+                <span class="highlight-label">Location</span>
+                <span class="highlight-value">Kano</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Schedule Section -->
+      <section class="schedule-section">
+        <div class="schedule-item">
+          <p class="schedule-time">2:00pm</p>
+          <h3 class="schedule-title">Arrival & check-in</h3>
+        </div>
+        <div class="schedule-item">
+          <p class="schedule-time">2:00pm</p>
+          <h3 class="schedule-title">Opening remarks</h3>
+        </div>
+        <div class="schedule-item">
+          <p class="schedule-time">2:15pm</p>
+          <h3 class="schedule-title">Main show & networking</h3>
+        </div>
+        <div class="schedule-item">
+          <p class="schedule-time">8:00pm</p>
+          <h3 class="schedule-title">Afterparty</h3>
+        </div>
+      </section>
+
+      <!-- Why Attend Section -->
+      <section class="why-attend-section">
+        <div class="why-attend-content">
+          <p class="why-attend-label">Why attend</p>
+          <h2 class="why-attend-title">Built for standout experiences.</h2>
+          <ul class="why-attend-list">
+            <li>
+              <span class="list-dot" style="background-color: #10b981;"></span>
+              Curated crowd with creators, talent, and community leaders.
+            </li>
+            <li>
+              <span class="list-dot" style="background-color: #fbbf24;"></span>
+              High-energy production and stage moments throughout the night.
+            </li>
+            <li>
+              <span class="list-dot" style="background-color: #22d3ee;"></span>
+              Smooth check-in and guest experience from arrival to afterparty.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Registration Form -->
+        <form id="inviteForm" class="registration-form">
+          <div class="form-header">
+            <div>
+              <p class="form-label">Registration</p>
+              <h3 class="form-subtitle">Reserve your place</h3>
+            </div>
+            <span class="form-badge">Free entry</span>
+          </div>
+
+          <div id="formSuccess" class="form-message success"></div>
+          <div id="formError" class="form-message error"></div>
+
+          <div class="form-grid">
+            <label class="form-field">
+              <span class="field-label">Full name</span>
+              <input
+                id="full_name"
+                name="full_name"
+                type="text"
+                placeholder="Your name"
+                class="form-input"
+              />
+              <span class="field-error" id="error-full_name"></span>
+            </label>
+
+            <label class="form-field">
+              <span class="field-label">Email</span>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                class="form-input"
+              />
+              <span class="field-error" id="error-email"></span>
+            </label>
+          </div>
+
+          <div class="form-grid form-grid-top-margin">
+            <label class="form-field">
+              <span class="field-label">WhatsApp number</span>
+              <input
+                id="whatsapp_number"
+                name="whatsapp_number"
+                type="tel"
+                placeholder="+234 ..."
+                class="form-input"
+              />
+              <span class="field-error" id="error-whatsapp_number"></span>
+            </label>
+
+            <label class="form-field">
+              <span class="field-label">Attendance</span>
+              <select id="attendance" name="attendance" class="form-input">
+                <option value="attending">Attending</option>
+                <option value="maybe">Maybe</option>
+                <option value="not_attending">Not attending</option>
+              </select>
+              <span class="field-error" id="error-attendance"></span>
+            </label>
+          </div>
+
+          <div id="paymentSection" class="payment-section" style="display: none;">
+            <label class="form-field">
+              <span class="field-label">Payment made?</span>
+              <select id="payment_made" name="payment_made" class="form-input">
+                <option value="">Select option</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+              <span class="field-error" id="error-payment_made"></span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-submit">Confirm registration</button>
+        </form>
+      </section>
+
+      <!-- Confirmation Modal -->
+      <div id="confirmationModal" class="confirmation-modal" style="display: none;">
+        <div class="confirmation-content">
+          <div class="confirmation-header">
+            <h2 class="confirmation-title">Registration Confirmed! 🎉</h2>
+            <p class="confirmation-subtitle">Your KSTV Icons event pass is ready</p>
+          </div>
+
+          <div class="confirmation-body">
+            <div class="participant-info">
+              <p class="info-label">Registered Name:</p>
+              <p class="info-value" id="participantName"></p>
+            </div>
+
+            <div class="qr-container">
+              <p class="qr-label">Your Event Pass (Scan at Entry)</p>
+              <div id="qrCode" class="qr-code-box"></div>
+              <a id="qrLink" class="qr-link" href="#" target="_blank" rel="noreferrer noopener" style="display: none;">Generating link...</a>
+              <p class="qr-instruction">Scan this QR code at the event entrance for quick check-in</p>
+            </div>
+
+            <div class="confirmation-actions">
+              <button type="button" class="btn-download" onclick="downloadQRCode()">
+                <svg viewBox="0 0 24 24" class="download-icon"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                Download QR Code
+              </button>
+              <button type="button" class="btn-close" onclick="closeConfirmation()">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
