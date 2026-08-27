@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KSTV Icons - Admin</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <main class="admin-page">
+    <section class="admin-panel" aria-live="polite">
+      <a class="admin-back-link" href="index.html">Back to registration</a>
+      <p class="admin-kicker">KSTV Icons / Hangout</p>
+      <h1>Registration desk</h1>
+      <p class="admin-intro">Sign in to view the current number of registered participants.</p>
+
+      <form id="adminLoginForm" class="admin-form">
+        <label class="form-field">
+          <span class="field-label">Admin email</span>
+          <input id="adminEmail" class="form-input" type="email" autocomplete="username" required />
+        </label>
+        <label class="form-field">
+          <span class="field-label">Password</span>
+          <input id="adminPassword" class="form-input" type="password" autocomplete="current-password" required />
+        </label>
+        <button class="btn-submit" type="submit">Sign in</button>
+      </form>
+
+      <p id="adminMessage" class="admin-message" role="alert"></p>
+
+      <section id="adminDashboard" class="admin-dashboard" hidden>
+        <div class="dashboard-heading">
+          <div>
+            <p class="admin-kicker">Live total</p>
+            <h2>Registered participants</h2>
+          </div>
+          <button id="refreshCount" class="admin-action" type="button">Refresh</button>
+        </div>
+        <p id="participantCount" class="participant-count">--</p>
+        <button id="adminLogout" class="admin-logout" type="button">Sign out</button>
+      </section>
+    </section>
+  </main>
+  <script src="admin.js"></script>
+</body>
+</html>
