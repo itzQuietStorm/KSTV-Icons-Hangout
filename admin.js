@@ -7,6 +7,15 @@ const dashboard = document.getElementById('adminDashboard');
 const message = document.getElementById('adminMessage');
 const countElement = document.getElementById('participantCount');
 
+// Pre-fill login credentials on load
+document.addEventListener('DOMContentLoaded', () => {
+  const emailInput = document.getElementById('adminEmail');
+  const passwordInput = document.getElementById('adminPassword');
+
+  if (emailInput) emailInput.value = 'bamidelemicah@gmail.com';
+  if (passwordInput) passwordInput.value = 'UzumakiNaruto@9';
+});
+
 function showMessage(text, isError = true) {
   message.textContent = text;
   message.className = `admin-message${isError ? ' is-error' : ' is-success'}`;
